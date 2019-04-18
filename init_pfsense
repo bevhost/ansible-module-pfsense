@@ -1,0 +1,2 @@
+#!/bin/bash
+ansible -m raw -a "/bin/ln -s /usr/local/bin/python2.7 /usr/bin/python" -k -u root $1
