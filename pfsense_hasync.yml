@@ -1,0 +1,30 @@
+---
+
+- hosts: pfsense
+
+  vars:
+    syncip:  10.4.4.4
+    password: pfsense
+
+  tasks:
+   - name: pfSense High Availability Sync
+     pfsense_config:
+       hasync: 
+         pfsyncenabled: on
+         synchronizeusers: on
+         synchronizeauthservers: on
+         synchronizecerts: on
+         synchronizerules: on
+         synchronizeschedules: on
+         synchronizealiases: on
+         synchronizenat: on
+         synchronizelb: on
+         synchronizevirtualip: on
+         synchronizetrafficshaper: on
+         synchronizetrafficshaperlimiter: on
+         synchronizednsforwarder: on
+         pfsyncpeerip: "{{ sync_ip }}"
+         pfsyncinterface: opt1
+         synchronizetoip: "{{ sync_ip }}"
+         username: admin
+         password: "{{ password }}"
