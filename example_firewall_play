@@ -1,0 +1,3 @@
+#!/bin/bash
+ANSIBLE_DEBUG=0
+ansible-playbook -i hosts $0.yml -u root -k 

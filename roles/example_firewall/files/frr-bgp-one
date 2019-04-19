@@ -1,0 +1,12 @@
+router bgp 64512
+ bgp router-id 10.236.87.1
+ network 10.236.87.0/24
+ neighbor upstream peer-group
+ neighbor upstream remote-as 64515
+ neighbor upstream capability dynamic
+ neighbor upstream prefix-list pl-allowed-adv out
+ neighbor 10.1.1.1 peer-group upstream
+ neighbor 10.1.1.1 description ACME ISP
+!
+ip prefix-list pl-allowed-adv seq 5 permit 82.195.133.0/25
+ip prefix-list pl-allowed-adv seq 10 deny any

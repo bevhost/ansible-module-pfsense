@@ -1,0 +1,73 @@
+fw_filter: 
+  - 
+   tracker: 1543885692
+   state: absent
+  - 
+   tracker: 1543903293
+   state: absent
+  - 
+   type: pass
+   tracker: 1548207384
+   ipprotocol: inet
+   protocol: icmp
+   icmptype: any
+   interface: "lan"
+   direction: any
+   statetype: "keep state"
+   source: 
+    any: ""
+   destination: 
+    any: ""
+  - 
+   type: pass
+   tracker: 1536555732
+   ipprotocol: inet
+   protocol: tcp
+   interface: "wan,lan"
+   direction: in
+   statetype: "keep state"
+   floating: yes
+   source: 
+    any: ""
+   destination: 
+    network: "(self)"
+    port: 179
+  -
+   id: ""
+   tracker: 1543885692
+   type: pass
+   interface: "wan,lan"
+   ipprotocol: inet
+   tag: ""
+   tagged: ""
+   direction: any
+   floating: yes
+   max: ""
+   "max-src-nodes": ""
+   "max-src-conn": ""
+   "max-src-states": ""
+   statetimeout: ""
+   statetype: "keep state"
+   os: ""
+   protocol: "tcp/udp"
+   source:
+    any: ""
+   destination:
+    address: DNS_Servers
+    port: 53
+   descr: ""
+  -
+   type: pass
+   tracker: 1543903293
+   ipprotocol: inet
+   protocol: udp
+   interface: "wan,lan"
+   direction: any
+   statetype: "keep state"
+   floating: yes
+   source:
+    any: ""
+   destination:
+    port: 123
+    address: NTP_Servers
+

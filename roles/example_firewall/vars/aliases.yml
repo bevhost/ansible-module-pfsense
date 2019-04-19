@@ -1,0 +1,35 @@
+---
+
+
+fw_aliases:
+
+  - name: DNS_Servers
+    type: host
+    address: '8.8.8.8 1.1.1.1'
+    descr: "Name Servers"
+    detail: "google||cloudflare"
+
+  - name: NMS_IP
+    type: host
+    address: 172.31.2.1
+    descr: Network Monitoring Servers
+
+  - name: NMS_PORTS
+    type: port
+    address: '161'
+
+  - name: NTP_Servers
+    type: host
+    address: 203.14.0.250||203.14.0.251
+    detail: tic||toc
+
+  - name: rfc1918
+    type: network
+    address: '10.0.0.0/8 172.16.0.0/12 192.168.0.0/16'
+    descr: 'private addressing'
+
+  - name: Windows_Ports
+    type: port
+    address: '88 3268 3269 135 138 139 389 445 464 53 137 123 49152:65535 3389'
+    descr: 'Windows Networking'
+

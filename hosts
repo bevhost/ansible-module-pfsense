@@ -1,0 +1,4 @@
+
+[pfsense]
+my-test-firewall ansible_host=10.2.2.2 site=one
+my-other-firewall ansible_host=10.3.3.3 site=two

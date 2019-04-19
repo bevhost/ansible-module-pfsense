@@ -1,0 +1,33 @@
+---
+- name: "Setup pfsense firewalls"
+  hosts: "pfsense"
+  roles:
+    - example_firewall
+
+  vars_files:
+    - roles/example_firewall/vars/aliases.yml
+    - roles/example_firewall/vars/rules.yml
+
+  vars:  
+    domain: acmecorp.com
+    business_unit: operations
+    contact_email: operations@acmecorp.com
+    cert:
+      descr: "2018 acmecorp.com"
+      public:  "{{ lookup('file', '/etc/ssl/certs/wild.acmecorp.com.crt' ) | b64encode }}"
+      private: "{{ lookup('file', '/etc/ssl/certs/wild.acmecorp.com.key' ) | b64encode }}"
+    net:
+      one:
+        wanip: 192.2.0.8
+        wangw: 192.2.0.9
+        street: "30 Commercial Road"
+      two:
+        wanip: 192.2.0.10
+        wangw: 192.2.0.11
+        street: "42 Railway Parade"
+    frr:
+      one: "{{ lookup('file', 'frr-bgp-one' ) | b64encode }}"
+      two: "{{ lookup('file', 'frr-bgp-two' ) | b64encode }}"
+    zebra: "{{ lookup('file', 'zebra.conf' ) | b64encode }}"
+  
+
