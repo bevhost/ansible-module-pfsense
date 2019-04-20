@@ -223,7 +223,7 @@ def run_module():
 
         for p in ['descr','log','disabled','quick','floating','protocol','icmptype']:
             if type(params[p]) in [str,unicode]:
-                if index=='' or params[p] != cfg['rule'][index][p]:
+                if index=='' or p not in cfg['rule'][index] or params[p] != cfg['rule'][index][p]:
                     configuration += "$rule['" + p + "'] = '" + params[p] + "';\n"
                     diff = True
         if diff:
