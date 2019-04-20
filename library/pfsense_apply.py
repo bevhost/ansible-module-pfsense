@@ -134,7 +134,7 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=False
+        supports_check_mode=True
     )
 
     params = module.params
@@ -180,7 +180,7 @@ def run_module():
         configuration += "services_snmpd_configure();\n"
     
     if 'filter' in services or DoAll:
-        configuration += "filter_configure();\nclear_subsystem_dirty('filter');\n"
+        configuration += "require_once('filter.inc');filter_configure();clear_subsystem_dirty('filter');\n"
 
     if 'hasync' in services or DoAll:
         configuration += "interfaces_sync_setup();\n"
