@@ -173,7 +173,7 @@ def run_module():
         protocol=dict(required=False, default=None, choices=['tcp', 'udp', 'tcp/udp', 'icmp', 'esp', 'ah', 'gre', 'ipv6', 'igmp', 'ospf', 'any', 'carp', 'pfsync', None]),
         direction=dict(required=False, default='any', choices=['any','in','out']),
         statetype=dict(required=False, default='keep state', choices=['keep state','sloppy state','synproxy state','none']),
-        floating=dict(required=False),
+        floating=dict(required=False, choices=[None, True]),
         source=dict(required=False, type=dict, default=dict(any='') ),
         destination=dict(required=False, type=dict, default=dict(any='') ),
         log=dict(required=False),
@@ -193,6 +193,7 @@ def run_module():
 
     configuration = ""
     diff = False
+    updated = ""
 
     # Make sure we're actually targeting a pfSense firewall
     if not os.path.isfile(cmd):
@@ -213,19 +214,30 @@ def run_module():
                 params['icmptype'] = None
 
         for p in ['source','destination']:
-            if index=='' or cmp(params[p],cfg['rule'][index][p]):
-                diff = True
+            for el in params[p]:
+                if index=='' or (el not in cfg['rule'][index][p]) or (str(cfg['rule'][index][p][el]) != str(params[p][el])):
+                    diff = True
+                    updated += ":"+p+"."+el
 
         for p in ['type','tracker','ipprotocol','interface','direction','statetype']:
             configuration += "$rule['" + p + "'] = '" + params[p] + "';\n"
-            if index=='' or params[p] != cfg['rule'][index][p]:
+            if index=='' or (str(params[p]) != str(cfg['rule'][index][p])):
                 diff = True
+                updated += ":"+p
 
-        for p in ['descr','log','disabled','quick','floating','protocol','icmptype']:
+        for p in ['descr','log','disabled','quick','protocol','icmptype']:
             if type(params[p]) in [str,unicode]:
-                if index=='' or p not in cfg['rule'][index] or params[p] != cfg['rule'][index][p]:
-                    configuration += "$rule['" + p + "'] = '" + params[p] + "';\n"
+                configuration += "$rule['" + p + "'] = '" + params[p] + "';\n"
+                if index=='' or (p not in cfg['rule'][index]) or (str(params[p]) != str(cfg['rule'][index][p])):
                     diff = True
+                    updated += ":"+p
+
+        for p in ['floating']:
+            if type(params[p]) in [bool]:
+                configuration += "$rule['" + p + "'] = " + str(params[p]) + ";\n"
+                if index=='' or (p not in cfg['rule'][index]):
+                    diff = True
+                    updated += ":"+p
         if diff:
             configuration += "$rule['source'] = [" + ', '.join("'%s'=>%r" % (key,val) for (key,val) in params['source'].iteritems()) + "];\n"
             configuration += "$rule['destination'] = [" + ', '.join("'%s'=>%r" % (key,val) for (key,val) in params['destination'].iteritems()) + "];\n"
@@ -239,6 +251,7 @@ def run_module():
 
 
     result['phpcode'] = configuration
+    result['updated'] = updated
 
     if module.check_mode:
         module.exit_json(**result)
