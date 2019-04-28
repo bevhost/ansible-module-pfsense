@@ -12,30 +12,19 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: pfsense_config
+module: pfsense_filter_rules
 
-short_description: Loads arbitrarty config items into the pfsense configuration
+short_description: Loads a firewall filter rule into pfSense
 
 description:
-  - Loads specified configuration values into the pfSense $config
-    safe_mode (default) prevents the creation of new keys that do not already exist in the config.
-    If safe mode is turned off, new keys can be created, if done incorrectly, could produce strange results.
-    To determine what can be loaded, save a prefconfigured pfSense Firewall confuration xml file and convert it to yaml.
-  - CAN NOT be used to unset an option such as $config['system']['dnsallowoverride']);
+It's expected it would normally be used with a list of rules 
+exported as xml from a source firewall then converted to yaml
+See list and single useage examples below
+
+However, it could be used in singularly with a rule provided manually.
 
 version_added: "2.7"
 
-options:
-  option:
-    section:
-      - Top level section to set. Could be 'system', 'snmpd', 'syslog', 'widgets', etc.
-    required: true
-  value:
-    description:
-      - string, simple list or dict values.
-        Must only be 1 level deep.
-        Must only be used for single items, use other modules for things that have multiple entries.
-    required: true
 
 author:
     - David Beveridge (@bevhost)
@@ -54,61 +43,44 @@ ansible_python_interpreter=/usr/local/bin/python2.7
 '''
 
 EXAMPLES = '''
-- name: System Configuration
-  pfsense_config:
-    system:
-      hostname: "{{ inventory_hostname }}"
-      domain: "{{domain}}"
-      timezone: Australia/Sydney
-      timeservers: au.pool.ntp.org
-      dnsserver:
-        - 1.1.1.1
-        - 8.8.8.8
-      dnslocalhost: ""
-      disablechecksumoffloading: ""
-      webgui:
-        logincss: "bf7703"
-        loginshowhost: ""
-        webguihostnamemenu: "hostonly"
-        authmode: "Central Auth"
-        ssl-certref: "{{ cert['public'] | hash('sha1') }}"
-        protocol: https
+# example_firewall.yml playbook
+  vars_files:
+    - roles/example_firewall/vars/rules.yml
+  tasks:
+    - pfsense_filter_rules:
+        state: "{{ item.state | default('present') }}"
+        tracker: "{{ item.tracker }}"
+        type: "{{ item.type | default('pass') }}"
+        interface: "{{ item.interface | default('lan') }}"
+        ipprotocol: "{{ item.ipprototcol | default('inet') }}"
+        direction: "{{ item.direction | default('any') }}"
+        floating: "{{ item.floating | default(omit) }}"
+        statetype: "{{ item.statetype | default('keep state') }}"
+        protocol: "{{ item.protocol | default(omit) }}"
+        source: "{{ item.source | default(dict(any='')) }}"
+        destination: "{{ item.destination | default(dict(any='')) }}"
+      with_items: "{{ fw_filter }}"
 
-- name: SNMP Configuration
-  pfsense_config:
-    snmpd:
-      syslocation: "{{ business_unit }} Firewall {{ net[site].street }}"
-      syscontact: "{{ contact_email }}"
-      rocommunity: public
-      pollport: 161
-      enable: ""
-      trapenable: ""
-      trapserver: 10.98.76.54
-      trapstring: myrwcomstr
-      bindip: all
+# roles/example_firewall/tasks/main.yml
+- pfsense_filter_rules:
+    type: pass
+    tracker: 1542170888
+    ipprotocol: inet
+    protocol: tcp
+    interface: lan
+    direction: any
+    statetype: "keep state"
+    source:
+      any: ""
+    destination:
+      network: "(self)"
+      port: 443
 
-- name: SysLog Configuration
-  pfsense_config:
-    syslog:
-      filterdescriptions: 1
-      nentries: 50
-      remoteserver: "10.1.1.1"
-      remoteserver2: ""
-      remoteserver3: ""
-      sourceip: ""
-      ipproto: ipv4
-      logall: ""
-
-- name: NAT Config
-  pfsense_config:
-    nat:
-      outbound:
-        mode: hybrid
 '''
 
 RETURN = '''
 filter_rules:
-    description: dict containing data structure for that section
+    description: dict containing current filter rules
 debug:
     description: Any debug messages for unexpected input types
     type: str
