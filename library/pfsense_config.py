@@ -204,6 +204,8 @@ def run_module():
 
             # Read existing configuration
             result[section] = read_config(module,section)
+            if not type(result[section]) is dict:
+                result[section] = dict()
 
             # Loop through provided keys in the section
             for key in params[section]:
