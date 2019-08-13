@@ -59,51 +59,12 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import json
-import platform
-import os
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check
 import time
-
-cmd = "/usr/local/sbin/pfSsh.php"
 
 
 def uniqid(prefix = ''):
     return prefix + hex(int(time()))[2:10] + hex(int(time()*1000000) % 0x100000)[2:7]
-
-def write_config(module,configuration):
-
-    php = configuration+'\nwrite_config();\nexec\nexit\n'
-
-    rc, out, err = module.run_command(cmd,data=php)
-    if rc != 0:
-        module.fail_json(msg='error writing config',error=err, output=out)
-
-
-def read_config(module,section):
-
-    php = 'echo "\n".json_encode($config["'+section+'"])."\n";\nexec\nexit\n'
-
-    rc, out, err = module.run_command(cmd,data=php)
-    if rc != 0:
-        module.fail_json(msg='error reading config',error=err, output=out)
-
-    start = "\npfSense shell: exec\n"
-    end = "\npfSense shell: exit\n"
-    try:
-        s = out.index(start) + len(start)
-        e = out.index(end)
-        return json.loads(out[s:e])
-    except:
-        module.fail_json(msg='error converting to JSON', json=out[s:e])
-
-
-def search(elements,key,val):
-
-    if type(elements) in [dict,list]:
-        for k,v in enumerate(elements):
-            if v[key] == val:
-                return k
-    return ''
 
 
 def run_module():
@@ -132,11 +93,7 @@ def run_module():
     configuration = ""
     params = module.params
 
-    # Make sure we're actually targeting a pfSense firewall
-    if not os.path.isfile(cmd):
-        module.fail_json(msg='pfSense shell not found at '+cmd)
-    if platform.system() != "FreeBSD":
-        module.fail_json(msg='pfSense platform expected: FreeBSD found: '+platform.system())
+    pfsense_check(module)
 
     cfg = read_config(module,section)
 
