@@ -26,7 +26,7 @@ ansible -m raw -a "/bin/ln -s /usr/local/bin/python2.7 /usr/bin/python" -k -u ro
 ```
 Alternatively, you could use an inventory variable
 ```
-[fpsense:vars]
+[pfsense:vars]
 ansible_python_interpreter=/usr/local/bin/python2.7
 ```
 
