@@ -64,48 +64,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import json
-import platform
-import os
-
-cmd = "/usr/local/sbin/pfSsh.php"
-
-def write_config(module,configuration,post=""):
-
-    php = 'require("auth.inc");\n'+configuration+'\nwrite_config();\n'+post+'\nexec\nexit\n'
-
-    rc, out, err = module.run_command(cmd,data=php)
-    if rc != 0:
-        module.fail_json(msg='error writing config',error=err, output=out)
-
-
-def read_config(module,section):
-
-    php = 'echo "\n".json_encode($config["'+section+'"])."\n";\nexec\nexit\n'
-
-    rc, out, err = module.run_command(cmd,data=php)
-    if rc != 0:
-        module.fail_json(msg='error reading config',error=err, output=out)
-
-    start = "\npfSense shell: exec\n"
-    end = "\npfSense shell: exit\n"
-    try:
-        s = out.index(start) + len(start)
-        e = out.index(end)
-        return json.loads(out[s:e])
-    except:
-        module.fail_json(msg='error converting to JSON', json=out[s:e])
-
-
-def search(elements,key,val):
-
-    if type(elements) in [dict,list]:
-        for k,v in enumerate(elements):
-            if v[key] == val:
-                return k
-
-    return ""
-
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check
 
 
 def run_module():
@@ -128,6 +87,9 @@ def run_module():
     params = module.params
 
     configuration = ""
+    
+    pfsense_check(module)
+
     system = read_config(module,'system')
     index = search(system['user'],'name',params['username'])
 
