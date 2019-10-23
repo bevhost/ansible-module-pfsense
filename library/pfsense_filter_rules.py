@@ -132,7 +132,7 @@ def run_module():
 
     # get config and find our rule
     cfg = read_config(module,'filter')
-    index = search(module,cfg['rule'],'tracker',params['tracker'])
+    index = search(cfg['rule'],'tracker',params['tracker'])
 
     base = "$config['filter']['rule'][" + str(index) + "]"
 
