@@ -14,9 +14,12 @@ def write_config(module, configuration):
         module.fail_json(msg='error writing config',error=err, output=out)
 
 
-def read_config(module, section):
+def read_config(module, section = None):
 
-    php = 'echo "\n".json_encode($config["'+section+'"])."\n";\nexec\nexit\n'
+    if section:
+        php = 'echo "\n".json_encode($config["'+section+'"])."\n";\nexec\nexit\n'
+    else:
+        php = 'echo "\n".json_encode($config)."\n";\nexec\nexit\n'
 
     rc, out, err = module.run_command(cmd,data=php)
     if rc != 0:
