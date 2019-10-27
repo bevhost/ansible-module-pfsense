@@ -56,9 +56,7 @@ def pfsense_check(module):
 def validate(module,message,data,regex="^[^']*$"):
     r = re.compile(regex)
     if type(data) in [dict,list]:
-        print("#######"+message+"###### ")
 	for k,v in enumerate(data):
-            print ("|"+str(k)+":"+str(v))
             if not r.match(v):
                 module.fail_json(msg='invalid data in parameter: '+message)
 	    if type(k) in [str,unicode]:
