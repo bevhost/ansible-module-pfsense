@@ -80,7 +80,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
 
 
 def run_module():
@@ -123,6 +123,7 @@ def run_module():
     if params['state'] == 'present':
         for p in args:
             if type(params[p]) in [str,unicode]:
+                validate(module,p,params[p])
                 if index=='':
                     configuration += "$alias['"+p+"']='" + params[p] + "';\n"
                 elif not p in cfg['alias'][index] or cfg['alias'][index][p] != params[p]:

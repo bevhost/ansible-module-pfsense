@@ -57,7 +57,7 @@ RETURN = '''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, pfsense_check, validate
 import os
 
 
@@ -102,6 +102,7 @@ def run_module():
     if params['state'] == 'present':
         for p in args:
             if type(params[p]) in [str,unicode]:
+                validate(module,p,params[p])
                 if index=="" or (p in frr and params[p] != frr[p]):
                     configuration += base + "['"+p+"']='" + params[p] + "';\n"
     elif params['state'] == 'absent':

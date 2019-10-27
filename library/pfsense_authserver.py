@@ -91,7 +91,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
 
 
 def run_module():
@@ -157,6 +157,7 @@ def run_module():
     if params['state'] == 'present':
 
         for p in ['type','refid','name','host']:
+            validate(module,p,params[p])
             if index=='':
                 configuration += "$auth['" + p + "'] = '" + params[p] + "';\n"
             elif params[p] != cfg['authserver'][index][p]:
@@ -164,6 +165,7 @@ def run_module():
 
         for p in params:
             if type(params[p]) is str and p.split('_')[0]==params['type']:
+                validate(module,p,params[p])
                 if index=='':
                     configuration += "$auth['" + p + "'] = '" + params[p] + "';\n"
                 elif  params[p] != cfg['authserver'][index][p]:

@@ -125,7 +125,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, pfsense_check, validate
 
 
 def run_module():
@@ -182,6 +182,7 @@ def run_module():
                 # Check that key exists in config (unless we are allowing key create "safe: no")
                 if (key in result[section]) or AllowCreateKeys:
 
+                    validate(module,section+":"+key,params[section][key])
                     # String Type
                     if type(params[section][key]) is str:
                         # Validate Data type provided matches existing config
@@ -212,6 +213,7 @@ def run_module():
                                 module.fail_json(msg=section + ":" + key + " requires " + str(type(result[section][key])))
                         # Loop thru subkeys k in dict
                         for (k,v) in params[section][key].iteritems():
+                            validate(module,section+":"+key+":"+k,v)
                             if (k in result[section][key]) or AllowCreateKeys:
                                 # Type validation
                                 if (k in result[section][key]):
