@@ -75,7 +75,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
 
 
 def run_module():
@@ -104,6 +104,9 @@ def run_module():
 
     pfsense_check(module)
 
+    validate(module,'name',params['name'],'^[a-zA-Z0-9_.][a-zA-Z0-9_.-]{0,30}[a-zA-Z0-9_.$-]$')
+    validate(module,'priv',params['priv'])
+
     system = read_config(module,'system')
     index = search(system['group'],'name',params['name'])
     if index=='':
@@ -116,6 +119,7 @@ def run_module():
     if params['state'] == 'present':
         for p in ['name','description','scope']:
             if type(params[p]) in [str,unicode]:
+                validate(module,p,params[p])
                 if index=='':
                     configuration += "$group['"+p+"']='" + params[p] + "';\n"
                 elif system['group'][index][p] != params[p]:

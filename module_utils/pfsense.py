@@ -1,6 +1,7 @@
 import json
 import os
 import platform
+import re
 
 cmd = "/usr/local/sbin/pfSsh.php"
 
@@ -50,3 +51,19 @@ def pfsense_check(module):
         module.fail_json(msg='pfSense shell not found at '+cmd)
     if platform.system() != "FreeBSD":
         module.fail_json(msg='pfSense platform expected: FreeBSD found: '+platform.system())
+
+
+def validate(module,message,data,regex="^[^']*$"):
+    r = re.compile(regex)
+    if type(data) in [dict,list]:
+	for k,v in enumerate(data):
+            if not r.match(v):
+                module.fail_json(msg='invalid data in parameter: '+message)
+	    if type(k) in [str,unicode]:
+		if not r.match(k):
+                    module.fail_json(msg='invalid data in parameter: '+message)
+    else:
+        if r.match(data):
+            return
+        else:
+            module.fail_json(msg='invalid data in parameter: '+message)

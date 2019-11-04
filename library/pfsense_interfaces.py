@@ -60,7 +60,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
 
 
 def run_module():
@@ -93,6 +93,7 @@ def run_module():
 
     pfsense_check(module)
 
+
     name = params['name']
     cfg = read_config(module,section)
 
@@ -108,6 +109,7 @@ def run_module():
     for key in ['ipaddr','subnet','descr']:
         if params[key]:
             if not key in cfg[name] or params[key] != cfg[name][key]:
+                validate(module,key,params[key])
                 configuration += interface + "['"+key+"']='" + params[key] + "';\n"
 
     # Handle enable param
@@ -128,6 +130,7 @@ def run_module():
         else:
             for p, key in gw_params.iteritems():
                 if p in params:
+                    validate(module,p,params[p])
                     if (key not in gateways['gateway_item'][gw]) or (params[p] != gateways['gateway_item'][gw][key]):
                         gw_diff = True
 
