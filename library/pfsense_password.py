@@ -107,6 +107,7 @@ def run_module():
         module.exit_json(**result)
 
     if configuration != '':
+        configuration = 'require("auth.inc");\n'+configuration
         configuration += "local_user_set_password($config['system']['user']["+str(index)+"], '"+params['password']+"');\n"
         write_config(module,configuration,post="local_user_set($config['system']['user']["+str(index)+"]);")
         result['changed'] = True

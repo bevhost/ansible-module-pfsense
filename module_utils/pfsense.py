@@ -5,9 +5,9 @@ import platform
 cmd = "/usr/local/sbin/pfSsh.php"
 
 
-def write_config(module, configuration):
+def write_config(module, configuration, post=""):
 
-    php = configuration+'\nwrite_config();\nexec\nexit\n'
+    php = configuration+'\nwrite_config();\n'+post+'\nexec\nexit\n'
 
     rc, out, err = module.run_command(cmd,data=php)
     if rc != 0:
