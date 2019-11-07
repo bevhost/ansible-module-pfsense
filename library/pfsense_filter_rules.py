@@ -179,6 +179,7 @@ def run_module():
     elif params['state'] == 'absent':
         if index != '':
             configuration += "unset("+base+");\n"
+            diff = True
     else:
         module.fail_json(msg='Incorrect state value, possible choices: absent, present(default)')
 
