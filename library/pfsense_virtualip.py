@@ -64,7 +64,7 @@ import time
 
 
 def uniqid(prefix = ''):
-    return prefix + hex(int(time()))[2:10] + hex(int(time()*1000000) % 0x100000)[2:7]
+    return prefix + hex(int(time.time()))[2:10] + hex(int(time.time()*1000000) % 0x100000)[2:7]
 
 
 def run_module():
@@ -77,6 +77,10 @@ def run_module():
         subnet=dict(Required=True),
         subnet_bits=dict(required=False,default='32'),
         type=dict(required=False,default='single'),
+        vhid=dict(required=False, default=''),
+        password=dict(required=False, default=''),
+        advbase=dict(required=False, default='1'),
+        advskew=dict(required=False, default='0'),
         descr=dict(required=False,default='')
     )
 
@@ -108,7 +112,7 @@ def run_module():
 
     base = "$config['virtualip']['vip'][" + str(index) + "]"
     if params['state'] == 'present':
-        for p in ['mode','type','uniqid','interface','descr','subnet','subnet_bits']:
+        for p in ['mode','type','uniqid','interface','descr','subnet','subnet_bits','vhid','password','advbase','advskew']:
             if type(params[p]) in [str,unicode]:
                 validate(module,p,params[p])
                 if index=='':
