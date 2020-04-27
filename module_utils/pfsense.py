@@ -67,11 +67,11 @@ def validate(module,message,data,regex="^[^']*$"):
         for k,v in enumerate(data):
             if not r.match(v):
                 module.fail_json(msg='invalid data in parameter: '+message)
-            if isstr(type(k)):
+            if isstr(k):
                 if not r.match(k):
                     module.fail_json(msg='invalid data in parameter: '+message)
     else:
-        if isstr(type(data)):
+        if isstr(data):
             if r.match(data):
                 return
             else:
