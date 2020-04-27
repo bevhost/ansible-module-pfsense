@@ -3,6 +3,14 @@ import os
 import platform
 import re
 
+try:
+    isinstance("", basestring)
+    def isstr(s):
+        return isinstance(s, basestring)
+except NameError:
+    def isstr(s):
+        return isinstance(s, str)
+
 cmd = "/usr/local/sbin/pfSsh.php"
 
 
@@ -59,11 +67,11 @@ def validate(module,message,data,regex="^[^']*$"):
         for k,v in enumerate(data):
             if not r.match(v):
                 module.fail_json(msg='invalid data in parameter: '+message)
-            if type(k) in [str,unicode]:
+            if isstr(type(k)):
                 if not r.match(k):
                     module.fail_json(msg='invalid data in parameter: '+message)
     else:
-        if type(data) in [str,unicode]:
+        if isstr(type(data)):
             if r.match(data):
                 return
             else:

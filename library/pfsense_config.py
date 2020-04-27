@@ -125,7 +125,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, pfsense_check, validate
+from ansible.module_utils.pfsense import write_config, read_config, pfsense_check, validate, isstr
 
 
 def run_module():
@@ -138,6 +138,7 @@ def run_module():
         widgets=dict(type=dict),
         hasync=dict(type=dict),
         nat=dict(type=dict),
+        installedpackages=dict(type=dict),
     )
 
     result = dict(
@@ -184,10 +185,10 @@ def run_module():
 
                     validate(module,section+":"+key,params[section][key])
                     # String Type
-                    if type(params[section][key]) is str:
+                    if isstr(params[section][key]):
                         # Validate Data type provided matches existing config
                         if (key in result[section]):
-                            if type(result[section][key]) not in [str,unicode]:
+                            if not isstr(result[section][key]):
                                 module.fail_json(msg=section + ":" + key + " requires " + str(type(result[section][key])))
                         # Update if changed
                         if not key in result[section] or str(result[section][key]) != params[section][key]:
@@ -212,12 +213,12 @@ def run_module():
                             if type(result[section][key]) is not dict:
                                 module.fail_json(msg=section + ":" + key + " requires " + str(type(result[section][key])))
                         # Loop thru subkeys k in dict
-                        for (k,v) in params[section][key].iteritems():
+                        for (k,v) in params[section][key].items():
                             validate(module,section+":"+key+":"+k,v)
                             if (k in result[section][key]) or AllowCreateKeys:
                                 # Type validation
                                 if (k in result[section][key]):
-                                    if type(result[section][key][k]) not in [str,unicode]:
+                                    if not isstr(result[section][key][k]):
                                         module.fail_json(msg="String expected in config at "+section + ":" + key + ":" + k + " " + str(type(result[section][key][k])) + " found")
                                 if type(v) is not str:
                                     module.fail_json(msg="String value expected in "+section + ":" + key + ":" + k)

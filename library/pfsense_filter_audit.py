@@ -74,7 +74,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, pfsense_check
+from ansible.module_utils.pfsense import write_config, read_config, pfsense_check, isstr
 
 
 def run_module():
@@ -100,7 +100,7 @@ def run_module():
     params = module.params
     enforce = params['enforce']
     rules = params['rules']
-    if not type(enforce) is str:
+    if not isstr(enforce):
         enforce = 'no'
 
     pfsense_check(module)

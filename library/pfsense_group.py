@@ -75,7 +75,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate, isstr
 
 
 def run_module():
@@ -118,7 +118,7 @@ def run_module():
     base = "$config['system']['group'][" + str(index) + "]"
     if params['state'] == 'present':
         for p in ['name','description','scope']:
-            if type(params[p]) in [str,unicode]:
+            if isstr(params[p]):
                 validate(module,p,params[p])
                 if index=='':
                     configuration += "$group['"+p+"']='" + params[p] + "';\n"

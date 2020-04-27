@@ -128,7 +128,7 @@ def run_module():
         if gw=='':
             gw_diff = True
         else:
-            for p, key in gw_params.iteritems():
+            for p, key in gw_params.items():
                 if p in params:
                     validate(module,p,params[p])
                     if (key not in gateways['gateway_item'][gw]) or (params[p] != gateways['gateway_item'][gw][key]):

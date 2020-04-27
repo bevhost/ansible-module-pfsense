@@ -64,7 +64,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate, isstr
 
 
 def run_module():
@@ -98,7 +98,7 @@ def run_module():
 
     base = "$config['system']['user'][" + str(index) + "]"
     for p in ['password','authorizedkeys']:
-        if type(params[p]) in [str,unicode]:
+        if isstr(params[p]):
             validate(module,p,params[p])
             if p not in system['user'][index] or system['user'][index][p] != params[p]:
                 configuration += base + "['"+p+"']='" + params[p] + "';\n"

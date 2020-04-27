@@ -59,7 +59,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate, isstr
 import time
 
 
@@ -103,7 +103,7 @@ def run_module():
 
     index=''
     if type(cfg) is dict and 'vip' in cfg:
-       if type(params['uniqid']) in [str,unicode]:
+       if isstr(params['uniqid']):
            index = search(cfg['vip'],'uniqid',params['uniqid'])
        else:
            params['uniqid'] = uniqid()
@@ -113,7 +113,7 @@ def run_module():
     base = "$config['virtualip']['vip'][" + str(index) + "]"
     if params['state'] == 'present':
         for p in ['mode','type','uniqid','interface','descr','subnet','subnet_bits','vhid','password','advbase','advskew']:
-            if type(params[p]) in [str,unicode]:
+            if isstr(params[p]):
                 validate(module,p,params[p])
                 if index=='':
                     configuration += "$virtualip['"+p+"']='" + params[p] + "';\n"

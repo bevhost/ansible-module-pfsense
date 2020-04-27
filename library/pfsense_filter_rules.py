@@ -89,7 +89,7 @@ phpcode:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate
+from ansible.module_utils.pfsense import write_config, read_config, search, pfsense_check, validate, isstr
 
 
 def run_module():
@@ -138,7 +138,7 @@ def run_module():
 
     if params['state'] == 'present':
 
-        if type(params['protocol']) in [str,unicode]:
+        if isstr(params['protocol']):
             if params['protocol']!='icmp':
                 params['icmptype'] = None
 
@@ -147,7 +147,7 @@ def run_module():
                 if index=='' or (el not in cfg['rule'][index][p]) or (str(cfg['rule'][index][p][el]) != str(params[p][el])):
                     diff = True
                     updated += ":"+p+"."+el
-            for (k,v) in params[p].iteritems():
+            for (k,v) in params[p].items():
                 validate(module,p+":"+el+":"+k,v)
 
         for p in ['type','tracker','ipprotocol','interface','direction','statetype']:
@@ -158,7 +158,7 @@ def run_module():
                 updated += ":"+p
 
         for p in ['descr','log','disabled','quick','protocol','icmptype']:
-            if type(params[p]) in [str,unicode]:
+            if isstr(params[p]):
                 validate(module,p,params[p])
                 configuration += "$rule['" + p + "'] = '" + params[p] + "';\n"
                 if index=='' or (p not in cfg['rule'][index]) or (str(params[p]) != str(cfg['rule'][index][p])):
@@ -172,8 +172,8 @@ def run_module():
                     diff = True
                     updated += ":"+p
         if diff:
-            configuration += "$rule['source'] = [" + ', '.join("'%s'=>%r" % (key,val) for (key,val) in params['source'].iteritems()) + "];\n"
-            configuration += "$rule['destination'] = [" + ', '.join("'%s'=>%r" % (key,val) for (key,val) in params['destination'].iteritems()) + "];\n"
+            configuration += "$rule['source'] = [" + ', '.join("'%s'=>%r" % (key,val) for (key,val) in params['source'].items()) + "];\n"
+            configuration += "$rule['destination'] = [" + ', '.join("'%s'=>%r" % (key,val) for (key,val) in params['destination'].items()) + "];\n"
             configuration += base + "=$rule;\n"
 
     elif params['state'] == 'absent':

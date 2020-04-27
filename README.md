@@ -14,6 +14,8 @@ At the time of writing, I was using
  - Ansible 2.7 on CentOS 7
  - pfSense 2.4.4
 
+Fixes were required for pfSense 2.4.5 to support python 3.7 (previously 2.7)
+
 ## pfSense Setup
 
 Since Ansible uses ssh, you must configure at least one interface on the firewall manually and turn on ssh.
